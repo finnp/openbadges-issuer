@@ -6,6 +6,8 @@ var prompt = require('sync-prompt').prompt
 var program = require('nomnom')
 var dateFormat = require('iso8601').fromDate
 
+program.script('issuer')
+
 program.command('init')
   .callback(function () {
     issuerCmd()

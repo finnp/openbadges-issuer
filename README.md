@@ -2,10 +2,12 @@
 
 A command line tool for managing files for issuing badges.
 
+Install with `npm install -g openbadges-issuer` and use it with the `issuer` command.
+
 ```
 $ issuer -h
 
-Usage: node issuer <command>
+Usage: issuer <command>
 
 command
   init       Issuer and class information
