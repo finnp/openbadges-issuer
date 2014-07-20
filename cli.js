@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 var resolve = require('url').resolve
-var pathJoin = require('path').join
+var path = require('path')
 var fs = require('fs')
 var prompt = require('sync-prompt').prompt
 var program = require('nomnom')
@@ -32,8 +32,38 @@ program.parse()
 // Commands
 
 function addCmd() {
-  var issuer = tryRead('issuer.json')
-  var badge = tryRead('class.json')
+  var root = determineIssuerRoot()
+  var issuer = require(path.join(root, 'issuer.json'))
+  
+  var dir
+  if(!path.relative(root, process.cwd())) {
+    var files = fs.readdirSync(root)
+    console.log('For which badge?')
+    files
+      .filter(function (file) {
+        return file.slice(0,6) === 'badge-'
+      })
+      .forEach(function (file) {
+        console.log('- ' + file)
+      })
+    // a select like inquirer would be nice here
+    var dirName = 'badge-' + prompt('Directory? badge-')
+    dir = path.join(process.cwd(), dirName)
+  } else {
+    if(path.basename(process.cwd()).slice(0,6) !== 'badge-') {
+      console.error('Not in a badge directory')
+      process.exit()
+    }
+    dir = process.cwd()
+  }
+  
+  var classPath = path.join(dir, 'class.json')
+  if(fs.existsSync(classPath)) {
+    var badgeClass = require(classPath)
+  } else {
+    console.error('No class.json found. First add this to your badge directory.')
+    process.exit()
+  }
   
   // Determine the ID of the most recently issued badge
   var files = fs.readdirSync('./')  
@@ -58,9 +88,10 @@ function addCmd() {
   receiver.verify = {
     type: 'hosted'
   }
-  receiver.verify.url = resolve(issuer.url,  receiver.uid + '.json')
+  var filename =  receiver.uid + '.json'
+  receiver.verify.url = resolve(issuer.url, filename)
   
-  writeJSON(receiver.uid, receiver)
+  writeJSON(path.join(dir, filename), receiver)
 }
 
 function issuerCmd() {
@@ -70,15 +101,22 @@ function issuerCmd() {
   issuer.name = prompt('Name? ')
   issuer.url = prompt('Root url? ')
   
-  writeJSON('issuer', issuer)
+  writeJSON(path.join(process.cwd(), 'issuer.json'), issuer)
 }
 
 function classCmd() {
-  var issuer = tryRead('issuer.json')
+  
+  var root = determineIssuerRoot()
+  
+  var issuer = require(path.join(root, 'issuer.json'))
+  
+  // create subdirectory for class
+  var dirName = 'badge-' + prompt('Name for the subfolder? badge-')
+  var dir = path.join(root, dirName)
+  fs.mkdirSync(dir)
   
   // class.json
   var badgeClass = {}
-  console.log('Badge class information:')
   badgeClass.name = prompt('Name? ')
   badgeClass.description = prompt('Description? ')
   // assuming badge.png as an image for now
@@ -93,22 +131,22 @@ function classCmd() {
   badgeClass.issuer = resolve(issuer.url, 'issuer.json')
   console.log('Issuer: ' + badgeClass.issuer)  
   
-  writeJSON('class', badgeClass)
+  writeJSON(path.join(dir, 'class.json'), badgeClass)
 }
 
 // Helper
-function tryRead(file) {
-  var fullFile = pathJoin(process.cwd(), file)
-  if(fs.existsSync(fullFile)) {
-    return require(fullFile)
-  } else {
-    console.log('No ' + file + ' found. First add this to your directory')
-    process.exit()
-  }
+
+function determineIssuerRoot() {
+  if(fs.existsSync('./issuer.json'))
+    return process.cwd()
+  if(fs.existsSync('../issuer.json'))
+    return path.normalize(path.join(process.cwd(), '..'))
+  console.error('No root directory found. Please add an issuer.json first.')
+  process.exit()
 }
 
-function writeJSON(name, json) {
-  console.log('Writing ' + name + '.json...')
-  fs.writeFileSync('./' + name + '.json', JSON.stringify(json, null, '  '))
+function writeJSON(writePath, json) {
+  console.log('Writing ' + path.basename(writePath) + '...')
+  fs.writeFileSync(writePath, JSON.stringify(json, null, '  '))
   console.log('Done.')
 }
