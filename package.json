@@ -24,9 +24,9 @@
   },
   "homepage": "https://github.com/finnp/openbadges-issuer",
   "dependencies": {
-    "sync-prompt": "^0.4.1",
     "nomnom": "^1.8.0",
     "iso8601": "^1.1.1",
-    "url-join": "0.0.1"
+    "url-join": "0.0.1",
+    "inquirer": "^0.5.1"
   }
 }
