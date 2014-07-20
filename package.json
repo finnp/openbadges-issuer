@@ -22,5 +22,10 @@
   "bugs": {
     "url": "https://github.com/finnp/openbadges-issuer/issues"
   },
-  "homepage": "https://github.com/finnp/openbadges-issuer"
+  "homepage": "https://github.com/finnp/openbadges-issuer",
+  "dependencies": {
+    "sync-prompt": "^0.4.1",
+    "nomnom": "^1.8.0",
+    "iso8601": "^1.1.1"
+  }
 }
