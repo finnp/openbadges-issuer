@@ -33,10 +33,19 @@ function addCmd() {
   var issuer = tryRead('issuer.json')
   var badge = tryRead('class.json')
   
+  // Determine the ID of the most recently issued badge
+  var files = fs.readdirSync('./')  
+  var maxId = files.reduce(function (acc, file) {
+    if(!file.match(/\d+\.json/)) return acc
+    var number = parseInt(file)
+    return number > acc ? number : acc
+  }, 0)
+    
   var receiver = {}
   console.log('Information for the receiver of the badge')
   // how to determine the id?
-  receiver.uid = 1
+  receiver.uid = maxId + 1
+  console.log('Reiceiver ID ' + receiver.uid)
   receiver.recipient = {
     type: 'email',
     hashed: false
