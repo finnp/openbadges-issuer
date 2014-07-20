@@ -4,6 +4,9 @@ A command line tool for managing files for issuing badges.
 
 Install with `npm install -g openbadges-issuer` and use it with the `issuer` command.
 
+And example how to host badges on Github Pages can be found on 
+[finnp/openbadges-host](https://github.com/finnp/openbadges-host).
+
 ```
 $ issuer -h
 
