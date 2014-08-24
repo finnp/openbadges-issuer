@@ -3,10 +3,6 @@ var program = require('nomnom')
 
 program.script('issuer')
 
-program.command('init')
-  .callback(require('./lib/commands/init.js'))
-  .help('Issuer and class information')
-  
 program.command('add')
   .callback(require('./lib/commands/add.js'))
   .help('Issue a badge to a person')
@@ -19,6 +15,10 @@ program.command('add')
     nohash: {
       help: "Do not hash the email adresses",
       flag: true
+    },
+    path: {
+      help: "The path to add the badge",
+      default: process.cwd()
     }
   })
   
