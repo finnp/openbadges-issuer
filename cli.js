@@ -10,6 +10,17 @@ program.command('init')
 program.command('add')
   .callback(require('./lib/commands/add.js'))
   .help('Issue a badge to a person')
+  .options({
+    email: {
+      position: 1,
+      help: 'Email adresses to issue a badge to',
+      list: true
+    },
+    nohash: {
+      help: "Do not hash the email adresses",
+      flag: true
+    }
+  })
   
 program.command('issuer')
   .callback(require('./lib/commands/issuer.js'))
